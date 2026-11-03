@@ -1,0 +1,237 @@
+HYPOTHESIS TESTS AND STATISTICAL RESULTS
+Statistical Business Analysis (Week 7)
+Data: sales_data.csv (100 orders) and customer_churn.csv (500 customers)
+Significance level: alpha = 0.05
+Note: the data has no marketing-spend column, so marketing spend was not analysed.
+
+======================================================================
+
+DESCRIPTIVE STATISTICS: SALES DATA
+                    Total_Sales  Quantity          Price
+Count                    100.00    100.00         100.00
+Mean                 123,650.48      4.78      25,808.51
+Median                97,955.50      5.00      24,192.00
+Mode                       none      4.00           none
+Std deviation        100,161.09      2.59      13,917.63
+Variance      10,032,243,003.46      6.70 193,700,431.55
+Minimum                6,540.00      1.00       1,308.00
+Maximum              373,932.00      9.00      49,930.00
+Range                367,392.00      8.00      48,622.00
+Q1 (25%)              39,517.50      2.75      14,965.25
+Q3 (75%)             175,792.50      7.00      38,682.25
+IQR                  136,275.00      4.25      23,717.00
+Skewness                   0.88      0.07          -0.01
+Kurtosis                  -0.18     -1.20          -1.26
+
+----------------------------------------------------------------------
+
+DESCRIPTIVE STATISTICS: CUSTOMER DATA
+               Tenure  MonthlyCharges  TotalCharges
+Count          500.00          500.00        500.00
+Mean            36.53          113.64      4,237.88
+Median          37.00          115.00      4,182.50
+Mode             3.00          115.00      4,023.00
+Std deviation   20.67           51.80      2,260.62
+Variance       427.13        2,683.23  5,110,402.05
+Minimum          1.00           20.00        159.00
+Maximum         71.00          199.00      7,992.00
+Range           70.00          179.00      7,833.00
+Q1 (25%)        19.00           67.00      2,237.25
+Q3 (75%)        54.00          158.00      6,266.75
+IQR             35.00           91.00      4,029.50
+Skewness        -0.09           -0.09         -0.03
+Kurtosis        -1.22           -1.21         -1.22
+
+----------------------------------------------------------------------
+
+NORMALITY TEST (Shapiro-Wilk) on Total_Sales: statistic = 0.899, p = 1.26e-06
+
+----------------------------------------------------------------------
+
+CORRELATION ANALYSIS (Pearson and Spearman, sales data)
+  Quantity vs Total_Sales: Pearson r = 0.688 (p = 2.6e-15), Spearman rho = 0.691 (p = 1.7e-15)
+  Price vs Total_Sales: Pearson r = 0.646 (p = 3.9e-13), Spearman rho = 0.680 (p = 7.4e-15)
+  Quantity vs Price: Pearson r = 0.008 (p = 0.94)
+
+----------------------------------------------------------------------
+
+CORRELATION (customer data)
+                Tenure  MonthlyCharges  TotalCharges  Churn
+Tenure           1.000          -0.060        -0.006 -0.509
+MonthlyCharges  -0.060           1.000        -0.042  0.107
+TotalCharges    -0.006          -0.042         1.000  0.004
+Churn           -0.509           0.107         0.004  1.000
+
+----------------------------------------------------------------------
+
+HYPOTHESIS TESTS (alpha = 0.05)
+
+----------------------------------------------------------------------
+
+TEST 1: Are West orders smaller than orders in the other regions? (Welch t-test)
+  H0 (no effect):  mean order value is the same in West and the other regions
+  H1 (effect):     mean order value is different
+  Result:          West mean = 81,689, others mean = 138,394, t = -2.72, Cohen's d = -0.58, p-value = 0.008887
+  Decision (alpha = 0.05): REJECT H0 (significant)
+  Meaning:         West orders are about Rs.56,704 smaller on average. The non-parametric Mann-Whitney test agrees (p = 0.003335). West was chosen after seeing the data, so treat this as exploratory; even with a Bonferroni correction for the 4 regions (p x 4 = 0.036) it stays significant.
+
+
+----------------------------------------------------------------------
+
+TEST 2: Are Laptop orders bigger than orders for other products? (Welch t-test)
+  H0 (no effect):  mean order value is the same for Laptop and other products
+  H1 (effect):     mean order value is different
+  Result:          Laptop mean = 162,050, others mean = 111,524, t = 1.94, Cohen's d = 0.51, p-value = 0.06093
+  Decision (alpha = 0.05): FAIL TO REJECT H0 (not significant)
+  Meaning:         Laptop orders look bigger, but with only 24 laptop orders the data cannot rule out chance at the 5% level.
+
+
+----------------------------------------------------------------------
+
+TEST 3: Does the mean order value differ between the 5 products? (one-way ANOVA)
+  H0 (no effect):  all 5 products have the same mean order value
+  H1 (effect):     at least one product has a different mean
+  Result:          F = 2.05, p-value = 0.09343
+  Decision (alpha = 0.05): FAIL TO REJECT H0 (not significant)
+  Meaning:         No clear evidence of a difference between products. The Kruskal-Wallis test agrees (p = 0.1082).
+
+
+----------------------------------------------------------------------
+
+TEST 4: Does the mean order value differ between the 4 regions? (one-way ANOVA)
+  H0 (no effect):  all 4 regions have the same mean order value
+  H1 (effect):     at least one region has a different mean
+  Result:          F = 2.16, p-value = 0.09724
+  Decision (alpha = 0.05): FAIL TO REJECT H0 (not significant)
+  Meaning:         Overall, the 4 regions are not clearly different at the 5% level, even though West on its own looked smaller in Test 1.
+
+
+----------------------------------------------------------------------
+
+TEST 5: Is leaving (churn) linked with the contract type? (chi-square test)
+  H0 (no effect):  churn is independent of the contract type
+  H1 (effect):     churn depends on the contract type
+  Result:          chi-square = 27.72, degrees of freedom = 2, p-value = 9.587e-07
+  Decision (alpha = 0.05): REJECT H0 (significant)
+  Meaning:         Churn rates: month-to-month 20.6%, one year 4.3%, two year 6.9%. Month-to-month customers leave much more often.
+
+
+----------------------------------------------------------------------
+
+TEST 6: Do customers who left have a different tenure? (Welch t-test)
+  H0 (no effect):  mean tenure is the same for customers who left and who stayed
+  H1 (effect):     mean tenure is different
+  Result:          left mean = 6.0 months, stayed mean = 40.2 months, t = -34.53, Cohen's d = -1.92, p-value = 8.982e-130
+  Decision (alpha = 0.05): REJECT H0 (significant)
+  Meaning:         Customers who left had only a few months of tenure. The difference is huge and not due to chance.
+
+
+----------------------------------------------------------------------
+
+TEST 7: Do customers who left pay different monthly charges? (Welch t-test)
+  H0 (no effect):  mean monthly charge is the same for customers who left and who stayed
+  H1 (effect):     mean monthly charge is different
+  Result:          left mean = 129.8, stayed mean = 111.7, t = 2.65, Cohen's d = 0.35, p-value = 0.01008
+  Decision (alpha = 0.05): REJECT H0 (significant)
+  Meaning:         Customers who left paid more per month on average, a small to moderate difference.
+
+
+----------------------------------------------------------------------
+
+TEST 8: Is churn linked with PaymentMethod? (chi-square test)
+  H0 (no effect):  churn is independent of PaymentMethod
+  H1 (effect):     churn depends on PaymentMethod
+  Result:          chi-square = 3.87, degrees of freedom = 2, p-value = 0.1445
+  Decision (alpha = 0.05): FAIL TO REJECT H0 (not significant)
+  Meaning:         No evidence of a link.
+
+
+----------------------------------------------------------------------
+
+TEST 9: Is churn linked with PaperlessBilling? (chi-square test)
+  H0 (no effect):  churn is independent of PaperlessBilling
+  H1 (effect):     churn depends on PaperlessBilling
+  Result:          chi-square = 0.05, degrees of freedom = 1, p-value = 0.8292
+  Decision (alpha = 0.05): FAIL TO REJECT H0 (not significant)
+  Meaning:         No evidence of a link.
+
+
+----------------------------------------------------------------------
+
+TEST 10: Is churn linked with SeniorCitizen? (chi-square test)
+  H0 (no effect):  churn is independent of SeniorCitizen
+  H1 (effect):     churn depends on SeniorCitizen
+  Result:          chi-square = 0.07, degrees of freedom = 1, p-value = 0.7951
+  Decision (alpha = 0.05): FAIL TO REJECT H0 (not significant)
+  Meaning:         No evidence of a link.
+
+
+----------------------------------------------------------------------
+
+95% CONFIDENCE INTERVALS
+
+----------------------------------------------------------------------
+
+CI 1: Average order value = Rs.123,650, 95% CI = Rs.103,776 to Rs.143,525 (margin of error = Rs.19,874, 16.1% of the mean)
+
+----------------------------------------------------------------------
+
+CI 2: Average order value by product
+            Orders      Mean    CI low   CI high  Margin of error
+Product                                                          
+Laptop          24  162050.0  112827.0  211274.0          49223.0
+Phone           20  142970.0   92803.0  193137.0          50167.0
+Tablet          26  110936.0   77668.0  144205.0          33269.0
+Headphones      15   92269.0   39008.0  145530.0          53261.0
+Monitor         15   89871.0   46901.0  132842.0          42971.0
+
+----------------------------------------------------------------------
+
+CI 3: West minus other regions = Rs.-56,704, 95% CI = Rs.-98,529 to Rs.-14,880
+
+----------------------------------------------------------------------
+
+CI 4: Overall churn rate = 10.6% (53 of 500), 95% CI = 8.2% to 13.6%
+
+----------------------------------------------------------------------
+
+CI 5: Churn rate by contract type
+                Customers  Left  Churn %  CI low %  CI high %
+Contract                                                     
+Month-to-month        170    35     20.6      15.2       27.3
+One year              186     8      4.3       2.2        8.3
+Two year              144    10      6.9       3.8       12.3
+
+----------------------------------------------------------------------
+
+REGRESSION MODEL 1: Total_Sales ~ Quantity + Price
+          Coefficient      CI low     CI high  p-value
+const     -121,682.22 -140,871.10 -102,493.33 4.14e-22
+Quantity    26,430.84   23,773.56   29,088.12 9.56e-36
+Price            4.61        4.12        5.10 1.30e-33
+R-squared = 0.884, adjusted R-squared = 0.882, F = 369.3, p = 4.40e-46, n = 100
+
+----------------------------------------------------------------------
+
+REGRESSION MODEL 2 (log-log): log(Total_Sales) ~ log(Quantity) + log(Price)
+const       0.0
+Quantity    1.0
+Price       1.0
+R-squared = 1.000
+Total_Sales equals Quantity x Price in every row: True
+
+----------------------------------------------------------------------
+
+Residual check: smallest predicted order value = Rs.-64,268; the residuals form a U-shaped curve, so the straight-line model is only an approximation (Model 2 fits exactly).
+
+----------------------------------------------------------------------
+
+BONFERRONI CHECK (10 tests were run, so each p-value is multiplied by 10)
+  Test 1: West vs other regions (order value): p = 0.00889, adjusted p = 0.0889 -> NOT significant after the correction
+  Test 2: Laptop vs other products (order value): p = 0.0609, adjusted p = 0.609 -> NOT significant after the correction
+  Test 3: ANOVA across products: p = 0.0934, adjusted p = 0.934 -> NOT significant after the correction
+  Test 4: ANOVA across regions: p = 0.0972, adjusted p = 0.972 -> NOT significant after the correction
+  Test 5: Churn vs contract type: p = 9.59e-07, adjusted p = 9.59e-06 -> still significant
+  Test 6: Tenure of customers who left vs stayed: p = 8.98e-130, adjusted p = 8.98e-129 -> still significant
+  Test 7: Monthly charges of customers who left vs stayed: p = 0.0101, adjusted p = 0.101 -> NOT significant after the correction
+  The strongest results (churn vs contract type, and tenure) survive the correction. The West and monthly-charges results are weaker evidence and should be confirmed with more data.
